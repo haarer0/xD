@@ -1,53 +1,82 @@
-# React + TypeScript + Vite
+# xD — Multidimensional Requirements Matrix
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**xD** is a browser app for modelling exception-heavy process logic as a decision table: **Inputs (P)**, **Modifiers (M)**, and **Outputs (R)**, with nested conditions, don’t-care cells, merge simplification, and overlap-based conflict detection.
 
-Currently, two official plugins are available:
+Built for business analysts and product owners who need an agreed case matrix—and a clear hand-off toward implementation—not a general-purpose rules engine.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- **P / M / R sections** — Inputs, Modifiers, and Outputs with per-section colours (customisable tints)
+- **Ternary cells** — `y` (assert), `n` (deny), `x` (don’t care), with shape-first icons for colour-blind use
+- **Nested parameters** — array dimensions with schema labels, tooltips, and expand-arrays column view
+- **Categories & sub-rows** — numbered cases (`1`, `1.1`, …), insert between rows, drag-and-drop reorder
+- **Simplify / merge** — collapse same-category rows that share outputs; don’t-care generalisation on P/M
+- **Conflict detection** — overlapping P+M coverage with different R (including don’t-care-as-any)
+- **Multi-project library** — switch, add, rename, delete projects in `localStorage` (with name confirmation on delete)
+- **Export / import** — CSV, Excel, and JSON (JSON opens in a copy/download dialog)
+- **Resolver & logic scheme** — conflict list plus generated implication-style lines
+- **Undo / redo** — edit history via keyboard shortcuts
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Condition values
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+| Symbol | Meaning | Icon cue |
+| --- | --- | --- |
+| **y** | Assert / yes | Filled circle + tick |
+| **n** | Deny / no | Ring + diagonal slash |
+| **x** | Don’t care (omit) | Diamond + tilde |
+
+Click a cell to cycle values (don’t care can be disabled per param in the schema).
+
+## Quick start
+
+Requires **Node.js** 18+ (or current LTS).
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open the URL Vite prints (usually `http://localhost:5173`).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+npm test          # Vitest (watch by default; use npm test -- --run for CI)
+npm run build     # typecheck + production bundle → dist/
+npm run preview   # serve the production build locally
+npm run lint      # ESLint
 ```
+
+## Usage notes
+
+- Projects autosave to **browser `localStorage`** (library of projects + active selection). Use **Export JSON** to back up or share.
+- **Demo** loads a sample nested matrix; **Start over** clears only the current project.
+- **Sections & schema** (status bar) manages columns, nested slots, don’t-care allowance, and section tints.
+- **Merge** collapses mergeable rows in the same category; status **mergeable** counts distinct rows that can merge, not pairwise combinations.
+
+## Stack
+
+- [React](https://react.dev/) 19 + [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vite.dev/) 6
+- [Zustand](https://zustand-demo.pmnd.rs/) + [zundo](https://github.com/charkour/zundo) (undo)
+- [Vitest](https://vitest.dev/) + Testing Library
+- [SheetJS](https://sheetjs.com/) (`xlsx`) for Excel export
+
+## Project layout
+
+```text
+src/
+  components/     UI (matrix, toolbar, modals, …)
+  domain/         merge, schema, flatten, logic scheme, …
+  export/         CSV / XLSX
+  persist/        localStorage library + JSON import/export
+  store/          Zustand project store
+docs/
+  POTENTIAL_FEATURES.md   product backlog / design notes
+```
+
+## Roadmap
+
+Ideas and prioritisation live in [`docs/POTENTIAL_FEATURES.md`](docs/POTENTIAL_FEATURES.md) (plain-language summaries, resolver contract export, glossary, etc.). Not a committed schedule.
+
+## License
+
+Private / unlicensed unless otherwise stated. Add a `LICENSE` file if you open the repo publicly.
