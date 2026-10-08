@@ -22,3 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+open-in-wsl.bat
+open-in-wsl.ps1
