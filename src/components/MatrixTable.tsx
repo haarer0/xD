@@ -251,7 +251,8 @@ export function MatrixTable() {
     const el = topHeaderRef.current
     if (!el) return
     const update = () => {
-      const h = el.getBoundingClientRect().height
+      // Integer px avoids sticky leaf top jitter (1px border flicker).
+      const h = Math.round(el.getBoundingClientRect().height)
       if (h > 0) setTopHeaderH(h)
     }
     update()
@@ -630,7 +631,11 @@ export function MatrixTable() {
                         onContextMenu={(e) => openCatnumMenu(e, row.id)}
                       >
                         <div
-                          className="row-insert-zone row-insert-zone-before"
+                          className={
+                            prevSame
+                              ? 'row-insert-zone row-insert-zone-before row-insert--sub'
+                              : 'row-insert-zone row-insert-zone-before row-insert--category'
+                          }
                           title={
                             prevSame
                               ? 'Insert subcategory row here'
@@ -664,7 +669,7 @@ export function MatrixTable() {
                         </div>
                         {rowIndex === project.rows.length - 1 && (
                           <div
-                            className="row-insert-zone row-insert-zone-after"
+                            className="row-insert-zone row-insert-zone-after row-insert--category"
                             title="Insert new category here"
                             onClick={(e) => {
                               e.stopPropagation()

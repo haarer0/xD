@@ -23,9 +23,11 @@ export function StatusBar({ onOpenResolver, onOpenSchema }: Props) {
           {project.rows.length} row{project.rows.length === 1 ? '' : 's'}
         </span>
         <span className="status-sep">·</span>
-        <span className={`status-item ${mergeCount > 0 ? 'warn' : ''}`}>
-          {mergeCount} mergeable
-        </span>
+        <Tip preferTop content="Distinct rows that share outputs with another row in the same category (can be merged together)">
+          <span className={`status-item ${mergeCount > 0 ? 'warn' : ''}`}>
+            {mergeCount} mergeable
+          </span>
+        </Tip>
         <span className="status-sep">·</span>
         <Tip preferTop content="Open the resolver">
           <button

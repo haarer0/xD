@@ -4,10 +4,10 @@ import { computeCategoryNumbers } from '../domain/categoryNumbers'
 import { buildHeaders, cellValue } from './csv'
 
 const SECTION_COLORS: Record<string, string> = {
-  inputs: 'FFD6EAF8',
-  middle: 'FFE8F5E9',
-  outputs: 'FFFFF3E0',
-  meta: 'FFF5F5F5',
+  inputs: 'FFD4EFFF',
+  middle: 'FFD4F5F2',
+  outputs: 'FFFFE8D6',
+  meta: 'FFF3F5F8',
 }
 
 export function projectToWorkbook(project: Project, expandArrays = true): XLSX.WorkBook {

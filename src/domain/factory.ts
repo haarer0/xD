@@ -37,9 +37,9 @@ export function schemaAfterRename(
 
 /** Default P / M / R section tints (match App.css --inputs / --middle / --outputs). */
 export const DEFAULT_SECTION_TINTS: Record<Section['role'], string> = {
-  inputs: '#1e3a5f',
-  middle: '#1a3d32',
-  outputs: '#4a3420',
+  inputs: '#1a5f8f',
+  middle: '#0e6b6b',
+  outputs: '#8a4a22',
 }
 
 export function resolveSectionTint(section: Pick<Section, 'role' | 'tint'>): string {

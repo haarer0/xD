@@ -92,9 +92,22 @@ export function findMergePairs(project: Project): MergePair[] {
   return pairs
 }
 
-/** Rows in the same category that share outputs and can be collapsed. */
+/**
+ * Distinct rows that can be merged with at least one other row
+ * (same category + same outputs). Not the number of pairwise opportunities.
+ */
+export function countMergeableRows(project: Project): number {
+  const ids = new Set<string>()
+  for (const pair of findMergePairs(project)) {
+    ids.add(pair.keepId)
+    ids.add(pair.dropId)
+  }
+  return ids.size
+}
+
+/** @deprecated Prefer countMergeableRows — kept as alias for call sites/tests. */
 export function countMergeOpportunities(project: Project): number {
-  return findMergePairs(project).length
+  return countMergeableRows(project)
 }
 
 function antecedentsOverlap(a: Row, b: Row, columnIds: string[]): boolean {

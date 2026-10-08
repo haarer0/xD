@@ -11,7 +11,7 @@ import {
 } from '../domain/factory'
 import { categoryGroupIds, moveRow, relocateRow } from '../domain/categoryNumbers'
 import {
-  countMergeOpportunities,
+  countMergeableRows,
   findConflicts,
   simplifyMatrix,
 } from '../domain/merge'
@@ -170,10 +170,12 @@ export const useProjectStore = create<ProjectState>()(
       },
       removeProject: (projectId) => {
         const { project, projects } = get()
-        if (projects.length <= 1) return
         const flushed = syncLibrary(project, projects)
-        const remaining = flushed.filter((p) => p.id !== projectId)
-        if (remaining.length === 0) return
+        let remaining = flushed.filter((p) => p.id !== projectId)
+        // Deleting the last project leaves a fresh empty one in the library.
+        if (remaining.length === 0) {
+          remaining = [createEmptyProject()]
+        }
         const next =
           projectId === project.id
             ? remaining[0]!
@@ -184,7 +186,7 @@ export const useProjectStore = create<ProjectState>()(
           projects: remaining,
           selectedRowId: next.rows[0]?.id ?? null,
         })
-        if (projectId === project.id) clearUndoHistory()
+        clearUndoHistory()
       },
       setViewMode: (viewMode) => set({ viewMode }),
       setExpandArrays: (expandArrays) => set({ expandArrays }),
@@ -426,7 +428,7 @@ export const useProjectStore = create<ProjectState>()(
         })
       },
 
-      getMergePairCount: () => countMergeOpportunities(get().project),
+      getMergePairCount: () => countMergeableRows(get().project),
       getConflicts: () => findConflicts(get().project),
 
       persist: () => {

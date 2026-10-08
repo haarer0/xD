@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { Project } from '../domain/types'
 import { useProjectStore } from '../store/projectStore'
 import { Tip } from './Tip'
 
@@ -15,6 +16,24 @@ function formatUpdated(iso: string): string {
   } catch {
     return ''
   }
+}
+
+function displayName(p: Pick<Project, 'name'>): string {
+  return p.name.trim() || 'Untitled'
+}
+
+function confirmDeleteProject(p: Project): boolean {
+  const expected = displayName(p)
+  const typed = window.prompt(
+    `Delete project permanently?\n\nType the project name to confirm:\n${expected}`,
+    '',
+  )
+  if (typed == null) return false
+  if (typed.trim() !== expected) {
+    window.alert('Name did not match — project was not deleted.')
+    return false
+  }
+  return true
 }
 
 export function ProjectSwitcher() {
@@ -60,7 +79,7 @@ export function ProjectSwitcher() {
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
-          <span className="project-switcher-name">{project.name || 'Untitled'}</span>
+          <span className="project-switcher-name">{displayName(project)}</span>
           <span className="project-switcher-caret" aria-hidden>
             ▾
           </span>
@@ -71,14 +90,14 @@ export function ProjectSwitcher() {
         <div className="project-switcher-menu" role="listbox" aria-label="Projects">
           <ul className="project-switcher-list">
             {sorted.map((p) => (
-              <li key={p.id}>
+              <li key={p.id} className="project-switcher-row">
                 <button
                   type="button"
                   role="option"
                   aria-selected={p.id === project.id}
                   className={
                     p.id === project.id
-                      ? 'project-switcher-item active'
+                      ? 'project-switcher-item is-current'
                       : 'project-switcher-item'
                   }
                   onClick={() => {
@@ -86,10 +105,24 @@ export function ProjectSwitcher() {
                     setOpen(false)
                   }}
                 >
-                  <span className="project-switcher-item-name">{p.name || 'Untitled'}</span>
+                  <span className="project-switcher-item-name">{displayName(p)}</span>
                   <span className="project-switcher-item-meta">
                     {formatUpdated(p.updatedAt)}
                   </span>
+                </button>
+                <button
+                  type="button"
+                  className="project-switcher-delete"
+                  aria-label={`Delete ${displayName(p)}`}
+                  title={`Delete “${displayName(p)}”…`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (!confirmDeleteProject(p)) return
+                    removeProject(p.id)
+                    setOpen(false)
+                  }}
+                >
+                  ×
                 </button>
               </li>
             ))}
@@ -119,22 +152,6 @@ export function ProjectSwitcher() {
             >
               Rename…
             </button>
-            {projects.length > 1 && (
-              <button
-                type="button"
-                className="danger"
-                onClick={() => {
-                  const ok = window.confirm(
-                    `Delete project “${project.name || 'Untitled'}”? This cannot be undone.`,
-                  )
-                  if (!ok) return
-                  removeProject(project.id)
-                  setOpen(false)
-                }}
-              >
-                Delete
-              </button>
-            )}
           </div>
         </div>
       )}

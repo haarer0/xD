@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { conditionsOverlap, mergeConditions } from './condition'
 import { createDemoProject, createEmptyProject, createRow } from './factory'
 import {
+  countMergeableRows,
   countMergeOpportunities,
   findConflicts,
   findMergePairs,
@@ -245,7 +246,8 @@ describe('simplifyMatrix nested example', () => {
     ]
 
     expect(findMergePairs(project)).toHaveLength(2)
-    expect(countMergeOpportunities(project)).toBe(2)
+    // Four rows, each pairable within its category → 4 distinct mergeable rows
+    expect(countMergeOpportunities(project)).toBe(4)
 
     const simplified = simplifyMatrix(project)
     expect(simplified.rows).toHaveLength(2)
@@ -278,6 +280,23 @@ describe('simplifyMatrix nested example', () => {
     const simplified = simplifyMatrix(project)
     expect(simplified.rows.map((r) => r.category)).toEqual(['Docas', 'DD', 'DD', 'DD'])
     expect(simplified.rows.filter((r) => r.category === 'DD' && r.cells[r1.id] === 'x')).toHaveLength(1)
+  })
+
+  it('counts distinct mergeable rows, not pairwise opportunities', () => {
+    const project = createEmptyProject()
+    const [p1, p2, p3] = project.sections[0]!.columns
+    const c1 = project.sections[1]!.columns[0]!
+    const r1 = project.sections[2]!.columns[0]!
+    const blank = {
+      [p1!.id]: 'x' as const,
+      [p2!.id]: 'x' as const,
+      [p3!.id]: 'x' as const,
+      [c1.id]: 'x' as const,
+      [r1.id]: 'x' as const,
+    }
+    project.rows = Array.from({ length: 7 }, () => createRow('New category', blank))
+    expect(findMergePairs(project)).toHaveLength(21)
+    expect(countMergeableRows(project)).toBe(7)
   })
 
   it('combines several same-output rows into one don’t-care consensus', () => {
